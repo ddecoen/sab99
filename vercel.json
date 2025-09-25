@@ -1,0 +1,12 @@
+{
+  "build": {
+    "env": {
+      "NEXT_PRIVATE_STANDALONE": "true"
+    }
+  },
+  "env": {
+    "NEXTAUTH_URL": "@nextauth_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "DATABASE_URL": "@database_url"
+  }
+}
