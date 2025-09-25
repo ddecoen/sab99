@@ -1,0 +1,6 @@
+# Ignore everything except the HTML file and documentation
+node_modules/
+package*.json
+*.md
+!README.md
+.git/
