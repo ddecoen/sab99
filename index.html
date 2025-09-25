@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAB 99 Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center py-12 px-4">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="text-center text-3xl font-extrabold text-gray-900">SAB 99 Tracker</h2>
+                <p class="mt-2 text-center text-sm text-gray-600">Track materiality assessments and out-of-period adjustments</p>
+            </div>
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <form id="loginForm" class="space-y-6">
+                    <div id="loginError" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg"></div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input id="email" type="email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your email">
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input id="password" type="password" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your password">
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        Sign In
+                    </button>
+                </form>
+                
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
+                    <div class="text-xs text-gray-600 space-y-1">
+                        <div>Admin: admin@company.com / admin123</div>
+                        <div>Accountant: accountant@company.com / acc123</div>
+                        <div>Auditor: auditor@company.com / audit123</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboardScreen" class="hidden">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-xl font-semibold text-gray-900">SAB 99 Tracker</h1>
+                        <div class="ml-10 flex space-x-8">
+                            <button onclick="showDashboard()" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</button>
+                            <button onclick="showNewEntry()" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">New Entry</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-sm text-gray-600">
+                            <span id="userName" class="font-medium"></span>
+                            <span id="userRole" class="ml-2 px-2 py-1 bg-gray-100 text-xs rounded-full"></span>
+                        </div>
+                        <button onclick="logout()" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent" class="max-w-7xl mx-auto py-6 px-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Dashboard</h2>
+                <button onclick="showNewEntry()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">Create New Entry</button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-blue-100 rounded-lg">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Entries</p>
+                            <p id="totalEntries" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-yellow-100 rounded-lg">
+                            <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Draft</p>
+                            <p id="draftEntries" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-orange-100 rounded-lg">
+                            <svg class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Under Review</p>
+                            <p id="reviewEntries" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-green-100 rounded-lg">
+                            <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Approved</p>
+                            <p id="approvedEntries" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entries Table -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Entries</h3>
+                <div id="entriesTable" class="overflow-x-auto">
+                    <div class="text-center py-8 text-gray-500">No entries yet. Create your first SAB 99 entry to get started.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Entry Form -->
+        <div id="newEntryContent" class="hidden max-w-4xl mx-auto py-6 px-4">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">New SAB 99 Entry</h2>
+                <p class="text-gray-600 mt-2">Create a new materiality assessment and out-of-period adjustment entry</p>
+            </div>
+
+            <form id="newEntryForm" class="space-y-8">
+                <!-- Basic Information -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Entry Number *</label>
+                            <input name="entryNumber" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="SAB99-2024-001">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Accounting Period *</label>
+                            <input name="accountingPeriod" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Q4 2023">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                            <textarea name="description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Describe the misstatement or adjustment..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Discovery Date *</label>
+                            <input name="discoveryDate" type="date" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Error Origin Period *</label>
+                            <input name="errorOriginPeriod" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Q3 2023">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Impact -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Financial Impact</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Monetary Amount *</label>
+                            <input name="monetaryAmount" type="number" required step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.00">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Quantitative Threshold</label>
+                            <input name="quantitativeThreshold" type="number" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Materiality threshold">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Accounts Affected</label>
+                            <input name="accountsAffected" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Revenue, Accounts Receivable">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Out-of-Period Assessment -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Out-of-Period Assessment</h3>
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input name="isOutOfPeriod" type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">This is an out-of-period adjustment</span>
+                        </label>
+                    </div>
+                    <div id="outOfPeriodFields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Iron Curtain Amount</label>
+                            <input name="ironCurtainAmount" type="number" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Balance sheet impact">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Rollover Amount</label>
+                            <input name="rolloverAmount" type="number" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Income statement impact">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resolution -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Resolution & Assessment</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Resolution Method *</label>
+                            <select name="resolutionMethod" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Out-of-Period Adjustment">Out-of-Period Adjustment</option>
+                                <option value="Restatement">Restatement</option>
+                                <option value="No Action Required">No Action Required</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Qualitative Factors</label>
+                            <textarea name="qualitativeFactors" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Describe any qualitative factors that may affect materiality..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+                            <textarea name="notes" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Any additional documentation or notes..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="showDashboard()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">Create Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Simple authentication
+        const users = {
+            'admin@company.com': { password: 'admin123', name: 'Admin User', role: 'admin' },
+            'accountant@company.com': { password: 'acc123', name: 'Senior Accountant', role: 'accountant' },
+            'auditor@company.com': { password: 'audit123', name: 'Internal Auditor', role: 'auditor' }
+        };
+
+        let currentUser = null;
+        let entries = JSON.parse(localStorage.getItem('sab99Entries') || '[]');
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const user = users[email];
+
+            if (user && user.password === password) {
+                currentUser = { email, ...user };
+                showDashboard();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userRole').textContent = user.role;
+                updateDashboardStats();
+            } else {
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = 'Invalid credentials';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        // Navigation functions
+        function showDashboard() {
+            document.getElementById('dashboardContent').classList.remove('hidden');
+            document.getElementById('newEntryContent').classList.add('hidden');
+            updateDashboardStats();
+            renderEntriesTable();
+        }
+
+        function showNewEntry() {
+            document.getElementById('dashboardContent').classList.add('hidden');
+            document.getElementById('newEntryContent').classList.remove('hidden');
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboardScreen').classList.add('hidden');
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        // Out-of-period checkbox toggle
+        document.querySelector('input[name="isOutOfPeriod"]').addEventListener('change', function() {
+            const fields = document.getElementById('outOfPeriodFields');
+            if (this.checked) {
+                fields.classList.remove('hidden');
+            } else {
+                fields.classList.add('hidden');
+            }
+        });
+
+        // Form submission
+        document.getElementById('newEntryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const entry = {
+                id: Date.now().toString(),
+                createdAt: new Date().toISOString(),
+                preparedBy: currentUser.name,
+                status: 'Draft'
+            };
+
+            // Convert form data to entry object
+            for (let [key, value] of formData.entries()) {
+                if (key === 'isOutOfPeriod') {
+                    entry[key] = true; // checkbox is checked
+                } else if (['monetaryAmount', 'quantitativeThreshold', 'ironCurtainAmount', 'rolloverAmount'].includes(key)) {
+                    entry[key] = parseFloat(value) || 0;
+                } else {
+                    entry[key] = value;
+                }
+            }
+
+            // Set checkbox to false if not checked
+            if (!entry.isOutOfPeriod) {
+                entry.isOutOfPeriod = false;
+            }
+
+            // Calculate materiality
+            const threshold = entry.quantitativeThreshold || 0;
+            const amount = entry.monetaryAmount || 0;
+            entry.quantitativeMaterial = threshold > 0 && amount > threshold;
+            entry.qualitativeMaterial = !!(entry.qualitativeFactors && entry.qualitativeFactors.trim());
+            
+            if (entry.quantitativeMaterial || entry.qualitativeMaterial) {
+                entry.overallMateriality = 'Material';
+            } else if (amount > 0 && threshold === 0) {
+                entry.overallMateriality = 'Requires Further Review';
+            } else {
+                entry.overallMateriality = 'Immaterial';
+            }
+
+            // Save entry
+            entries.push(entry);
+            localStorage.setItem('sab99Entries', JSON.stringify(entries));
+
+            // Show success and redirect
+            alert('SAB 99 entry created successfully!');
+            this.reset();
+            document.getElementById('outOfPeriodFields').classList.add('hidden');
+            showDashboard();
+        });
+
+        // Update dashboard statistics
+        function updateDashboardStats() {
+            const total = entries.length;
+            const draft = entries.filter(e => e.status === 'Draft').length;
+            const review = entries.filter(e => e.status === 'Under Review').length;
+            const approved = entries.filter(e => e.status === 'Approved').length;
+
+            document.getElementById('totalEntries').textContent = total;
+            document.getElementById('draftEntries').textContent = draft;
+            document.getElementById('reviewEntries').textContent = review;
+            document.getElementById('approvedEntries').textContent = approved;
+        }
+
+        // Render entries table
+        function renderEntriesTable() {
+            const tableContainer = document.getElementById('entriesTable');
+            
+            if (entries.length === 0) {
+                tableContainer.innerHTML = '<div class="text-center py-8 text-gray-500">No entries yet. Create your first SAB 99 entry to get started.</div>';
+                return;
+            }
+
+            const recentEntries = entries.slice(-10).reverse(); // Show last 10, newest first
+            
+            let tableHTML = `
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entry #</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materiality</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+            `;
+
+            recentEntries.forEach(entry => {
+                const materialityColor = entry.overallMateriality === 'Material' ? 'bg-red-100 text-red-800' :
+                                       entry.overallMateriality === 'Immaterial' ? 'bg-green-100 text-green-800' :
+                                       'bg-yellow-100 text-yellow-800';
+                                       
+                const statusColor = entry.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                  entry.status === 'Under Review' ? 'bg-orange-100 text-orange-800' :
+                                  'bg-gray-100 text-gray-800';
+
+                tableHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">${entry.entryNumber}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">${entry.description}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${entry.accountingPeriod}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${(entry.monetaryAmount || 0).toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${materialityColor}">
+                                ${entry.overallMateriality}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">
+                                ${entry.status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+            tableContainer.innerHTML = tableHTML;
+        }
+    </script>
+</body>
+</html>
